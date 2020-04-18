@@ -17,6 +17,7 @@ public class TesseractDriver
         try
         {
             string version = "Tesseract version: " + _tesseract.Version();
+            Debug.Log("*******************************");
             Debug.Log(version);
             return version;
         }
