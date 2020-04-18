@@ -1,13 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class NativeCam : MonoBehaviour
 {
+    [SerializeField] public RawImage outputImage;
+    private TesseractDriver _tesseractDriver;
+    [SerializeField] public Text displayText;
+    private string _text = "";
+    private Texture2D texture2;
+    private Texture2D _texture;
+    private static readonly List<string> fileNames = new List<string> { "tessdata.tgz" };
     // Start is called before the first frame update
     void Start()
     {
-        
+        _tesseractDriver = new TesseractDriver();
+        ResimCek(512);
     }
     // Update is called once per frame
     void Update()
@@ -22,18 +31,13 @@ public class NativeCam : MonoBehaviour
             {
                 // Kamera ile resim çek
                 // Eğer resmin genişliği veya yüksekliği 512 pikselden büyükse, resmi ufalt
-                ResimCek(512);
-                Debug.Log("sol yarıya tıklandı");
+                //ResimCek(512);
+                //Debug.Log("sol yarıya tıklandı");
             }
-            else
-            {
-                // Kamera ile video kaydet
-                VideoKaydet();
-                Debug.Log("sağ yarıya tıklandı");
-            }
+          
         }
     }
-    private void ResimCek(int maksimumBuyukluk)
+    public void ResimCek(int maksimumBuyukluk)
     {
         NativeCamera.Permission izin = NativeCamera.TakePicture((konum) =>
         {
@@ -41,7 +45,7 @@ public class NativeCam : MonoBehaviour
             if (konum != null)
             {
                 // Çekilen resmi bir Texture2D'ye çevir
-                Texture2D texture = NativeCamera.LoadImageAtPath(konum, maksimumBuyukluk);
+                Texture2D texture = NativeCamera.LoadImageAtPath(konum, maksimumBuyukluk, false);
                 if (texture == null)
                 {
                     Debug.Log(konum + " konumundaki resimden bir texture oluşturulamadı.");
@@ -58,34 +62,84 @@ public class NativeCam : MonoBehaviour
                 if (!material.shader.isSupported) // eğer Standard shader desteklenmiyorsa Diffuse shader'ı kullan
                     material.shader = Shader.Find("Legacy Shaders/Diffuse");
 
+                Recognize(texture);
                 material.mainTexture = texture;
-
+                //Texture2D texture2 = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
+                //texture2.SetPixels32(texture.GetPixels32());
+                //texture2.Apply();
+                
                 // 5 saniye sonra küp objesini yok et
                 Destroy(kup, 5f);
-
+                
                 // Küp objesi ile birlikte Texture2D objesini de yok et
                 // Eğer prosedürel bir objeyi (Texture2D) işiniz bitince yok etmezseniz,
                 // mevcut scene'i değiştirene kadar obje hafızada kalmaya devam eder
-                Destroy(texture, 5f);
+                //Destroy(texture, 5f);
             }
         }, maksimumBuyukluk);
 
         Debug.Log("İzin durumu: " + izin);
-    }
 
-    private void VideoKaydet()
+      
+    }
+    private void Recognize(Texture2D outputTexture)
     {
-        NativeCamera.Permission izin = NativeCamera.RecordVideo((konum) =>
-        {
-            Debug.Log("Kaydedilen videonun konumu: " + konum);
-            if (konum != null)
-            {
-                // Videoyu oynat
-                Handheld.PlayFullScreenMovie("file://" + konum);
-            }
-        });
+        Debug.Log("Recognize a geldi");
+        Debug.Log(outputTexture.height);
+        Debug.Log(outputTexture == null);
+        _texture = outputTexture;
+        ClearTextDisplay();
+        AddToTextDisplay(_tesseractDriver.CheckTessVersion());
+        _tesseractDriver.Setup(OnSetupCompleteRecognize);
+        //Debug.Log("Setup başarılı");
+        //AddToTextDisplay(_tesseractDriver.Recognize(outputTexture));
+        //AddToTextDisplay(_tesseractDriver.GetErrorMessage(), true);
+    }
+    private void OnSetupCompleteRecognize()
+    {
+        AddToTextDisplay(_tesseractDriver.Recognize(_texture));
+        AddToTextDisplay(_tesseractDriver.GetErrorMessage(), true);
+        SetImageDisplay();
 
-        Debug.Log("İzin durumu: " + izin);
+        //AddToTextDisplay(_tesseractDriver.Recognize(outputTexture));
+        //AddToTextDisplay(_tesseractDriver.GetErrorMessage(), true);
     }
 
+    private void ClearTextDisplay()
+    {
+        _text = "";
+    }
+
+    private void AddToTextDisplay(string text, bool isError = false)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            Debug.Log("Null geldi add text");
+            return;
+        }
+
+        _text += (string.IsNullOrWhiteSpace(displayText.text) ? "" : "\n") + text;
+
+        if (isError)
+            Debug.LogError(text);
+        else
+            Debug.Log(text);
+    }
+
+    private void LateUpdate()
+    {
+        Debug.Log(displayText.text);
+        Debug.Log(_text);
+
+        if (displayText.text != null && _text != null)
+            displayText.text = _text;
+    }
+
+    private void SetImageDisplay()
+    {
+        RectTransform rectTransform = outputImage.GetComponent<RectTransform>();
+        rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,
+            rectTransform.rect.width * _tesseractDriver.GetHighlightedTexture().height / _tesseractDriver.GetHighlightedTexture().width);
+        outputImage.texture = _tesseractDriver.GetHighlightedTexture();
+    }
 }

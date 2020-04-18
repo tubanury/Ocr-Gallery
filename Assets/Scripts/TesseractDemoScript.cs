@@ -23,8 +23,6 @@ public class TesseractDemoScript : MonoBehaviour
     private Texture2D _texture;
 
 
-  
-
     private void Start()
     {
         if (gall.PickImage(512) != null)

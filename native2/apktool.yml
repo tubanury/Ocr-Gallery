@@ -1,0 +1,68 @@
+!!brut.androlib.meta.MetaInfo
+apkFileName: native2.apk
+compressionType: false
+doNotCompress:
+- resources.arsc
+- assets/tessdata.tgz
+- assets/tessdata/eng.cube.bigrams
+- assets/tessdata/eng.cube.fold
+- assets/tessdata/eng.cube.lm
+- assets/tessdata/eng.cube.nn
+- assets/tessdata/eng.cube.params
+- assets/tessdata/eng.cube.size
+- assets/tessdata/eng.cube.word-freq
+- assets/tessdata/eng.tesseract_cube.nn
+- assets/tessdata/eng.traineddata
+- assets/tessdata/osd.traineddata
+- assets/tessdata/pdf.ttf
+- assets/tessdata/snum.traineddata
+- assets/tessdata/configs/alto
+- assets/tessdata/configs/ambigs.train
+- assets/tessdata/configs/api_config
+- assets/tessdata/configs/bigram
+- assets/tessdata/configs/box.train
+- assets/tessdata/configs/box.train.stderr
+- assets/tessdata/configs/digits
+- assets/tessdata/configs/get.images
+- assets/tessdata/configs/hocr
+- assets/tessdata/configs/inter
+- assets/tessdata/configs/kannada
+- assets/tessdata/configs/linebox
+- assets/tessdata/configs/logfile
+- assets/tessdata/configs/lstm.train
+- assets/tessdata/configs/lstmbox
+- assets/tessdata/configs/lstmdebug
+- assets/tessdata/configs/makebox
+- assets/tessdata/configs/pdf
+- assets/tessdata/configs/quiet
+- assets/tessdata/configs/rebox
+- assets/tessdata/configs/strokewidth
+- assets/tessdata/configs/tsv
+- assets/tessdata/configs/txt
+- assets/tessdata/configs/unlv
+- assets/tessdata/configs/wordstrbox
+- assets/tessdata/tessconfigs/batch
+- assets/tessdata/tessconfigs/batch.nochop
+- assets/tessdata/tessconfigs/matdemo
+- assets/tessdata/tessconfigs/msdemo
+- assets/tessdata/tessconfigs/nobatch
+- assets/tessdata/tessconfigs/segdemo
+- png
+isFrameworkApk: false
+packageInfo:
+  forcedPackageId: '127'
+  renameManifestPackage: null
+sdkInfo:
+  minSdkVersion: '23'
+  targetSdkVersion: '29'
+sharedLibrary: false
+sparseResources: false
+unknownFiles: {}
+usesFramework:
+  ids:
+  - 1
+  tag: null
+version: 2.4.1
+versionInfo:
+  versionCode: '1'
+  versionName: '0.1'
